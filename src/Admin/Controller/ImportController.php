@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use Yii;
 use yii\web\Controller;
@@ -13,8 +13,8 @@ use SK\GalleryModule\Model\ImportFeed;
 use SK\GalleryModule\Import\CsvImporter;
 use SK\GalleryModule\Import\ImageCreator;
 use SK\GalleryModule\Import\GalleryCreator;
-use SK\GalleryModule\Form\Admin\GalleriesImportForm;
-use SK\GalleryModule\Form\Admin\CategoriesImportForm;
+use SK\GalleryModule\Admin\Form\GalleriesImportForm;
+use SK\GalleryModule\Admin\Form\CategoriesImportForm;
 
 /**
  * ImportController

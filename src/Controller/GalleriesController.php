@@ -98,6 +98,7 @@ class GalleriesController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'sortParam' => 'o',
@@ -133,6 +134,10 @@ class GalleriesController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         return $this->render('all_galleries', [
             'page' => $page,
@@ -171,6 +176,7 @@ class GalleriesController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -181,6 +187,10 @@ class GalleriesController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         return $this->render('all_galleries', [
             'page' => $page,
@@ -219,6 +229,7 @@ class GalleriesController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -229,6 +240,10 @@ class GalleriesController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         return $this->render('all_galleries', [
             'page' => $page,
@@ -267,6 +282,7 @@ class GalleriesController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -277,6 +293,10 @@ class GalleriesController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         return $this->render('all_galleries', [
             'page' => $page,
@@ -315,6 +335,7 @@ class GalleriesController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -325,6 +346,10 @@ class GalleriesController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         return $this->render('all_galleries', [
             'page' => $page,

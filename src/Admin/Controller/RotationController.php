@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use yii\web\Response;
 use yii\web\Controller;

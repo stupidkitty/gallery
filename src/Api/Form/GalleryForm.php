@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Form\Api;
+namespace SK\GalleryModule\Api\Form;
 
 use yii\base\Model;
 use SK\GalleryModule\Model\Gallery;

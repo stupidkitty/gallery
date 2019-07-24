@@ -108,6 +108,7 @@ class CategoryController extends Controller implements ViewContextInterface
                     'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                     'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                     'forcePageParam' => false,
+                    'validatePage' => false,
                 ],
                 'sort' => $this->buildSort(),
                 'category_id' => $category['category_id'],
@@ -125,6 +126,7 @@ class CategoryController extends Controller implements ViewContextInterface
                     'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                     'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                     'forcePageParam' => false,
+                    'validatePage' => false,
                 ],
                 'sort' => $this->buildSort(),
             ]);
@@ -132,6 +134,10 @@ class CategoryController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         if ($settings->get('internal_register_activity', true, 'gallery')) {
             $this->on(
@@ -184,6 +190,7 @@ class CategoryController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -194,6 +201,10 @@ class CategoryController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         if ($settings->get('internal_register_activity', true, 'gallery')) {
             $this->on(
@@ -246,6 +257,7 @@ class CategoryController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'galleries'),
                 'pageSize' => $settings->get('items_per_page', 24, 'galleries'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -256,6 +268,10 @@ class CategoryController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         if ($settings->get('internal_register_activity', true, 'galleries')) {
             $this->on(
@@ -308,6 +324,7 @@ class CategoryController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -318,6 +335,10 @@ class CategoryController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         if ($settings->get('internal_register_activity', true, 'gallery')) {
             $this->on(
@@ -367,6 +388,7 @@ class CategoryController extends Controller implements ViewContextInterface
                 'defaultPageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'pageSize' => $settings->get('items_per_page', 24, 'gallery'),
                 'forcePageParam' => false,
+                'validatePage' => false,
             ],
             'sort' => [
                 'sortParam' => 'o',
@@ -392,6 +414,10 @@ class CategoryController extends Controller implements ViewContextInterface
 
         $galleries = $dataProvider->getModels();
         $pagination = $dataProvider->getPagination();
+
+        if ($page > 1 && empty($galleries)) {
+            Yii::$app->response->statusCode = 404;
+        }
 
         if ($settings->get('internal_register_activity', true, 'gallery')) {
             $this->on(
@@ -423,7 +449,7 @@ class CategoryController extends Controller implements ViewContextInterface
      *
      * @return mixed
      */
-    public function actionListAll(string $sort = '')
+    public function actionAllCategories(string $sort = '')
     {
         $settings = Yii::$container->get(SettingsInterface::class);
 
@@ -446,7 +472,7 @@ class CategoryController extends Controller implements ViewContextInterface
                 ],
             ],
             'defaultOrder' => [
-                'mv' => SORT_DESC,
+                'abc' => SORT_ASC,
             ],
         ]);
 

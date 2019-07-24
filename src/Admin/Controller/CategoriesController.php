@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use Yii;
 use yii\base\Event;
@@ -9,7 +9,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use SK\GalleryModule\Model\Category;
-use SK\GalleryModule\Form\Admin\CategoryForm;
+use SK\GalleryModule\Admin\Form\CategoryForm;
 use SK\GalleryModule\EventSubscriber\CategorySubscriber;
 
 /**

@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Api;
+namespace SK\GalleryModule\Api\Controller;
 
 use Yii;
 use yii\filters\Cors;

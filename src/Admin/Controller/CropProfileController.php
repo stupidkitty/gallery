@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use Yii;
 use yii\web\Controller;
@@ -8,7 +8,7 @@ use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use SK\GalleryModule\Model\CropProfile;
-use SK\GalleryModule\Form\Admin\CropProfileForm;
+use SK\GalleryModule\Admin\Form\CropProfileForm;
 
 /**
  * CropProfile implements the CRUD actions for CropProfile model.

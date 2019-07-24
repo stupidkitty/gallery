@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use Yii;
 use yii\base\Event;
@@ -20,13 +20,13 @@ use League\Flysystem\FilesystemInterface;
 use SK\GalleryModule\Model\RotationStats;
 use RS\Component\Core\Settings\SettingsInterface;
 use SK\GalleryModule\Queue\CreateThumbsJob;
-use SK\GalleryModule\Form\Admin\GalleryForm;
+use SK\GalleryModule\Admin\Form\GalleryForm;
 use RS\Component\Core\Generator\TimeIntervalGenerator;
-use SK\GalleryModule\Form\Admin\GalleryFilterForm;
+use SK\GalleryModule\Admin\Form\GalleryFilterForm;
 use SK\GalleryModule\Service\Image as ImageService;
 use SK\GalleryModule\EventSubscriber\GallerySubscriber;
 use SK\GalleryModule\Service\Gallery as GalleryService;
-use SK\GalleryModule\Form\Admin\GalleriesBatchActionsForm;
+use SK\GalleryModule\Admin\Form\GalleriesBatchActionsForm;
 
 /**
  * MainController implements the CRUD actions for Gallery model.

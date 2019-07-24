@@ -1,11 +1,11 @@
 <?php
-namespace SK\GalleryModule\Admin;
+namespace SK\GalleryModule\Admin\Controller;
 
 use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use RS\Component\Core\Settings\SettingsInterface;
-use SK\GalleryModule\Form\Admin\SettingsForm;
+use SK\GalleryModule\Admin\Form\SettingsForm;
 
 /**
  * SettingsController

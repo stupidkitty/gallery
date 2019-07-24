@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Form\Admin;
+namespace SK\GalleryModule\Admin\Form;
 
 use yii\base\Model;
 

@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Form\Admin;
+namespace SK\GalleryModule\Admin\Form;
 
 use yii\base\Model;
 use RS\Component\User\Model\User;
@@ -80,18 +80,18 @@ class GalleriesBatchActionsForm extends Model
         foreach ($query->batch(50) as $galleries) {
             foreach ($galleries as $gallery) {
                 // Изменение пользователя
-                if ((bool) $this->isChangeUser) {
-                    $gallery->user_id = $this->user_id;
+                if ((bool) $this->isChangeUser && is_numeric($this->user_id)) {
+                    $gallery->user_id = (int) $this->user_id;
                 }
 
-                // Изменение пользователя
-                if ((bool) $this->isChangeOrientation) {
-                    $gallery->orientation = $this->orientation;
+                // Изменение ориентации
+                if ((bool) $this->isChangeOrientation && is_numeric($this->orientation)) {
+                    $gallery->orientation = (int) $this->orientation;
                 }
 
                 // Изменение статуса
-                if ((bool) $this->isChangeStatus && !empty($this->status)) {
-                    $gallery->status = $this->status;
+                if ((bool) $this->isChangeStatus && is_numeric($this->status)) {
+                    $gallery->status = (int) $this->status;
                 }
 
                 $gallery->save();
@@ -106,6 +106,7 @@ class GalleriesBatchActionsForm extends Model
                         $gallery->addCategory($category);
                     }
                 }
+                
                 // Удаление категории
                 if ((bool) $this->isDeleteCategories) {
                     $categories = Category::find()

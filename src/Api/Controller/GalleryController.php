@@ -1,5 +1,5 @@
 <?php
-namespace SK\GalleryModule\Controller\Api;
+namespace SK\GalleryModule\Api\Controller;
 
 use Yii;
 use yii\filters\Cors;
@@ -10,7 +10,7 @@ use yii\filters\auth\HttpBearerAuth;
 use SK\GalleryModule\Model\Gallery;
 use SK\GalleryModule\Model\Category;
 use SK\GalleryModule\Import\ImageCreator;
-use SK\GalleryModule\Form\Api\GalleryForm;
+use SK\GalleryModule\Api\Form\GalleryForm;
 use SK\GalleryModule\Import\GalleryCreator;
 use SK\GalleryModule\Service\Gallery as GalleryService;
 
