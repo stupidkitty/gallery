@@ -83,7 +83,7 @@ class Rotator
                 $currentIndex ++;
             }
 
-           
+
             RotationStats::updateAll(
                 [
                     'current_shows' => 0,
@@ -93,7 +93,7 @@ class Rotator
                     "clicks{$currentIndex}" => (int) $thumbStat['current_clicks'],
                 ],
                 [
-                    'video_id' =>  $thumbStat['video_id'],
+                    'gallery_id' =>  $thumbStat['gallery_id'],
                     'category_id' =>  $thumbStat['category_id'],
                     'image_id' =>  $thumbStat['image_id'],
                 ]
