@@ -240,6 +240,7 @@ $js = <<< 'JS'
 
     let imageList = document.querySelector('#image-list');
 	let cardButtons = imageList.querySelectorAll('button[data-type="submit"]');
+    let hiddenInputCoverImage = document.querySelector('input#image_id');
 
 	cardButtons.forEach(function (cardButton) {
 		cardButton.addEventListener('click', function (event) {
@@ -297,6 +298,7 @@ $js = <<< 'JS'
 				} else if ('set-cover' === action) {
 					let coverImage = document.querySelector('#cover-image');
 					let imageUrl = imageCard.querySelector('img.gallery__card__img').getAttribute('src');
+                    hiddenInputCoverImage.value = imageId;
 
 					coverImage.setAttribute('src', imageUrl);
 				}
