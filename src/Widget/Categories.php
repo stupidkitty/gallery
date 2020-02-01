@@ -8,15 +8,16 @@ use SK\GalleryModule\Model\Category;
 
 class Categories extends Widget
 {
-    private $cacheKey = 'gallery:widget:categories:';
     /**
      * @var int Идентификатор текущей активной категории;
      */
     public $active_id = null;
+
     /**
      * @var string path to template
      */
     public $template;
+
     /**
      * @var array|string сортировка элементов
      * Можно использовать следующие параметры:
@@ -26,20 +27,51 @@ class Categories extends Widget
      * - clicks: integer, клики по категориям тумб.
      */
     public $order = 'title';
+
     /**
-     * @var int Время жизни кеша темплейта (html)
+     * Лимит вывода категорий.
+     *
+     * @var integer
+     */
+    public $limit;
+
+    /**
+     * Группирует категории по первой букве
+     *
+     * @var boolean
+     */
+    public $groupByFirstLetter = false;
+
+    /**
+     * Включает кеш виджета.
+     *
+     * @var boolean
+     */
+    public $enableCache = true;
+
+    /**
+     * Время жизни кеша темплейта (html)
+     *
+     * @var integer
      */
     public $cacheDuration = 300;
+
     /**
      * @var array Коллекция массивов категорий.
      */
     public $items = [];
+
+    private $cache;
+
+    private $defaultCacheKey = 'gallery:widget:categories:';
 
     /**
      * Initializes the widget
      */
     public function init() {
         parent::init();
+
+        $this->cache = Yii::$app->cache;
 
         if (!in_array($this->order, ['id', 'title', 'position', 'clicks'])) {
             $this->order = 'title';
@@ -56,10 +88,11 @@ class Categories extends Widget
      *
      * @return string|void
      */
-    public function run() {
+    public function run()
+    {
         $cacheKey = $this->buildCacheKey();
 
-        $html = Yii::$app->cache->get($cacheKey);
+        $html = $this->isCacheEnabled() ?  $this->cache->get($cacheKey) : false;
 
         if (false === $html) {
             $categories = $this->getItems();
@@ -73,7 +106,9 @@ class Categories extends Widget
                 'active_id' => $this->active_id,
             ]);
 
-            Yii::$app->cache->set($cacheKey, $html, $this->cacheDuration);
+            if ($this->isCacheEnabled()) {
+                $this->cache->set($cacheKey, $html, $this->cacheDuration);
+            }
         }
 
         return $html;
@@ -91,21 +126,67 @@ class Categories extends Widget
             $order = ['popularity' => SORT_DESC];
         }
 
-        $items = Category::find()
+        $query = Category::find()
             ->select(['category_id', 'slug', 'image_id', 'title', 'description', 'param1', 'param2', 'param3', 'on_index', 'galleries_num'])
             ->with(['coverImage' => function ($query) {
                 $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
                     ->where(['enabled' => 1]);
             }])
             ->where(['enabled' => 1])
-            ->orderBy($order)
-            ->all();
+            ->orderBy($order);
 
-        return $items;
+        if (null !== $this->limit) {
+            $query->limit((int) $this->limit);
+        }
+
+        if ($this->isGroupByFirstLetter()) {
+            $lastLetter = '';
+            $categories = [];
+
+            foreach ($query->all() as $category) {
+                $currentLetter = \mb_strtolower(\mb_substr($category->title, 0, 1));
+
+                if (\is_numeric($currentLetter)) {
+                    $currentLetter = '#';
+                }
+
+                $categories[$currentLetter][] = $category;
+                $lastLetter = $currentLetter;
+            }
+
+            return $categories;
+        }
+
+        return $query->all();
     }
 
+    /**
+     * Включен\выключен кеш виджета.
+     *
+     * @return boolean
+     */
+    private function isCacheEnabled()
+    {
+        return (bool) $this->enableCache;
+    }
+
+    /**
+     * Группировать или нет категории по первой букве.
+     *
+     * @return boolean
+     */
+    private function isGroupByFirstLetter()
+    {
+        return (bool) $this->groupByFirstLetter;
+    }
+
+    /**
+     * Создает ключ для кеша.
+     *
+     * @return string
+     */
     private function buildCacheKey()
     {
-        return "{$this->cacheKey}:{$this->order}:{$this->template}:{$this->active_id}";
+        return "{$this->defaultCacheKey}:{$this->order}:{$this->template}:{$this->active_id}";
     }
 }
