@@ -6,7 +6,7 @@ use SK\CronModule\Handler\HandlerInterface;
 
 class UpdateMaxCtr implements HandlerInterface
 {
-    public function run()
+    public function run(): void
     {
         $rotator = new Gallery();
         $rotator->updateMaxCtr();

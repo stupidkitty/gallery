@@ -6,7 +6,7 @@ use SK\CronModule\Handler\HandlerInterface;
 
 class CountGalleries implements HandlerInterface
 {
-    public function run()
+    public function run(): void
     {
         $rotator = new Category();
         $rotator->countGalleries();
