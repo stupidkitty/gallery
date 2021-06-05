@@ -1,16 +1,17 @@
 <?php
+
 namespace SK\GalleryModule\Controller;
 
-use Yii;
-use yii\web\Controller;
-use yii\filters\PageCache;
-use yii\caching\DbDependency;
-use yii\base\ViewContextInterface;
-use yii\web\NotFoundHttpException;
-use SK\GalleryModule\Model\Gallery;
 use RS\Component\Core\Filter\QueryParamsFilter;
 use RS\Component\Core\Settings\SettingsInterface;
+use SK\GalleryModule\Cache\PageCache;
 use SK\GalleryModule\EventSubscriber\GallerySubscriber;
+use SK\GalleryModule\Model\Gallery;
+use Yii;
+use yii\base\ViewContextInterface;
+use yii\caching\DbDependency;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * ViewController implements the view action for Gallery model.
@@ -20,7 +21,7 @@ class ViewController extends Controller implements ViewContextInterface
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'queryParams' => [
@@ -53,7 +54,7 @@ class ViewController extends Controller implements ViewContextInterface
      *
      * @return string
      */
-    public function getViewPath()
+    public function getViewPath(): string
     {
         return $this->module->getViewPath();
     }
@@ -63,7 +64,6 @@ class ViewController extends Controller implements ViewContextInterface
      *
      * @param integer $id
      * @param string $slug
-     *
      * @return mixed
      */
     public function actionIndex($id = 0, $slug = '')
@@ -94,26 +94,30 @@ class ViewController extends Controller implements ViewContextInterface
      * Find gallery by slug
      *
      * @param string $slug
-     *
      * @return null|Gallery
-     *
      * @throws NotFoundHttpException
      */
     protected function findBySlug($slug)
     {
         $gallery = Gallery::find()
-            ->with(['coverImage' => function ($query) {
-                $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
-                    ->where(['enabled' => 1]);
-            }])
-            ->with(['images' => function ($query) {
-                $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
-                    ->where(['enabled' => 1]);
-            }])
-            ->with(['categories' => function ($query) {
-                $query->select(['category_id', 'title', 'slug', 'h1'])
-                    ->where(['enabled' => 1]);
-            }])
+            ->with([
+                'coverImage' => function ($query) {
+                    $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
+            ->with([
+                'images' => function ($query) {
+                    $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
+            ->with([
+                'categories' => function ($query) {
+                    $query->select(['category_id', 'title', 'slug', 'h1'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
             ->where(['slug' => $slug])
             ->untilNow()
             ->onlyActive()
@@ -130,26 +134,30 @@ class ViewController extends Controller implements ViewContextInterface
      * Find gallery by id
      *
      * @param integer $id
-     *
      * @return null|Gallery
-     *
      * @throws NotFoundHttpException
      */
     protected function findById($id)
     {
         $gallery = Gallery::find()
-            ->with(['coverImage' => function ($query) {
-                $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
-                    ->where(['enabled' => 1]);
-            }])
-            ->with(['images' => function ($query) {
-                $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
-                    ->where(['enabled' => 1]);
-            }])
-            ->with(['categories' => function ($query) {
-                $query->select(['category_id', 'title', 'slug', 'h1'])
-                    ->where(['enabled' => 1]);
-            }])
+            ->with([
+                'coverImage' => function ($query) {
+                    $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
+            ->with([
+                'images' => function ($query) {
+                    $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
+            ->with([
+                'categories' => function ($query) {
+                    $query->select(['category_id', 'title', 'slug', 'h1'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
             ->where(['gallery_id' => $id])
             ->untilNow()
             ->onlyActive()

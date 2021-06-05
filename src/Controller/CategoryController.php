@@ -1,22 +1,22 @@
 <?php
+
 namespace SK\GalleryModule\Controller;
 
-use Yii;
-use yii\data\Sort;
-use yii\web\Controller;
-use yii\filters\PageCache;
-use yii\filters\VerbFilter;
-use yii\caching\DbDependency;
-use yii\data\ActiveDataProvider;
-use yii\base\ViewContextInterface;
-use yii\web\NotFoundHttpException;
-use SK\GalleryModule\Model\Gallery;
-use SK\GalleryModule\Model\Category;
 use RS\Component\Core\Filter\QueryParamsFilter;
 use RS\Component\Core\Settings\SettingsInterface;
-use SK\GalleryModule\Model\GalleriesCategoriesMap;
-use SK\GalleryModule\Provider\RotateGalleryProvider;
+use SK\GalleryModule\Cache\PageCache;
 use SK\GalleryModule\EventSubscriber\GallerySubscriber;
+use SK\GalleryModule\Model\Category;
+use SK\GalleryModule\Model\GalleriesCategoriesMap;
+use SK\GalleryModule\Model\Gallery;
+use SK\GalleryModule\Provider\RotateGalleryProvider;
+use Yii;
+use yii\base\ViewContextInterface;
+use yii\caching\DbDependency;
+use yii\data\ActiveDataProvider;
+use yii\data\Sort;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * CategoryController implements the list actions for Category model.
@@ -26,7 +26,7 @@ class CategoryController extends Controller implements ViewContextInterface
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             /*'verbs' => [
@@ -162,6 +162,132 @@ class CategoryController extends Controller implements ViewContextInterface
             'galleries' => $galleries,
             'pagination' => $pagination,
         ]);
+    }
+
+    /**
+     * Find category by id
+     *
+     * @param integer $id
+     * @return Category
+     * @throws NotFoundHttpException
+     */
+    public function findById(int $id)
+    {
+        $category = Category::find()
+            ->where(['category_id' => $id, 'enabled' => 1])
+            //->asArray()
+            ->one();
+
+        if (null === $category) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        return $category;
+    }
+
+    /**
+     * Find category by slug
+     *
+     * @param string $slug
+     * @return Category
+     * @throws NotFoundHttpException
+     */
+    public function findBySlug($slug)
+    {
+        $category = Category::find()
+            ->where(['slug' => $slug, 'enabled' => 1])
+            //->asArray()
+            ->one();
+
+        if (null === $category) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        return $category;
+    }
+
+    protected function buildSort()
+    {
+        return new Sort([
+            'sortParam' => 'o',
+            'attributes' => [
+                'date' => [
+                    'asc' => ['g.published_at' => SORT_DESC],
+                    'desc' => ['g.published_at' => SORT_DESC],
+                    'default' => SORT_DESC,
+                ],
+                'mv' => [
+                    'asc' => ['g.views' => SORT_DESC],
+                    'desc' => ['g.views' => SORT_DESC],
+                    'default' => SORT_DESC,
+                ],
+                'tr' => [
+                    'asc' => ['g.likes' => SORT_DESC],
+                    'desc' => ['g.likes' => SORT_DESC],
+                    'default' => SORT_DESC,
+                ],
+                'ctr' => [ // top rated
+                    'asc' => ['gs.ctr' => SORT_DESC],
+                    'desc' => ['gs.ctr' => SORT_DESC],
+                    'default' => SORT_DESC,
+                ],
+            ],
+            'defaultOrder' => [
+                'date' => [
+                    'g.published_at' => SORT_DESC,
+                ],
+            ],
+        ]);
+    }
+
+    protected function buildInitialQuery(Category $category, string $t)
+    {
+        $query = Gallery::find()
+            ->select(['g.gallery_id', 'g.image_id', 'g.slug', 'g.title', 'g.orientation', 'g.likes', 'g.dislikes', 'g.images_num', 'g.comments_num', 'g.views', 'g.published_at'])
+            ->alias('g')
+            ->innerJoin(['gcm' => GalleriesCategoriesMap::tableName()], 'g.gallery_id = gcm.gallery_id')
+            ->with([
+                'categories' => function ($query) {
+                    $query->select(['category_id', 'title', 'slug', 'h1'])
+                        ->where(['enabled' => 1]);
+                }
+            ])
+            ->with([
+                'coverImage' => function ($query) {
+                    $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
+                        ->where(['enabled' => 1]);
+                }
+            ]);
+
+        if ('all-time' === $t) {
+            $query->untilNow();
+        } elseif ($this->isValidRange($t)) {
+            $query->rangedUntilNow($t);
+        }
+
+        $query
+            ->onlyActive()
+            ->andwhere(['gcm.category_id' => $category->getId()]);
+        //->asArray();
+
+        return $query;
+    }
+
+    /**
+     * Проверяет корректность параметра $t в экшене контроллера.
+     * Значения: daily, weekly, monthly, early, all_time
+     *
+     * @param string $time Ограничение по времени.
+     * @return string.
+     * @throws NotFoundHttpException
+     */
+    protected function isValidRange($time)
+    {
+        if (in_array($time, ['daily', 'weekly', 'monthly', 'yearly', 'all-time'])) {
+            return true;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**
@@ -365,13 +491,12 @@ class CategoryController extends Controller implements ViewContextInterface
         ]);
     }
 
-
     /**
      * List galleries in category ordered by ctr
      *
      * @return mixed
      */
-    public function actionCtr(int $id = 0, string $slug = '', int $page = 1, string $t = 'all-time')
+    public function actionCtr(int $id = 0, string $slug = '', int $page = 1)
     {
         $settings = Yii::$container->get(SettingsInterface::class);
 
@@ -449,7 +574,7 @@ class CategoryController extends Controller implements ViewContextInterface
      *
      * @return mixed
      */
-    public function actionAllCategories(string $sort = '')
+    public function actionAllCategories()
     {
         $settings = Yii::$container->get(SettingsInterface::class);
 
@@ -488,133 +613,5 @@ class CategoryController extends Controller implements ViewContextInterface
             'settings' => $settings,
             'sort' => $sort,
         ]);
-    }
-
-    /**
-     * Find category by slug
-     *
-     * @param string $slug
-     *
-     * @return Category
-     *
-     * @throws NotFoundHttpException
-     */
-    public function findBySlug($slug)
-    {
-        $category = Category::find()
-            ->where(['slug' => $slug, 'enabled' => 1])
-            //->asArray()
-            ->one();
-
-        if (null === $category) {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-
-        return $category;
-    }
-
-    /**
-     * Find category by id
-     *
-     * @param integer $id
-     *
-     * @return Category
-     *
-     * @throws NotFoundHttpException
-     */
-    public function findById(int  $id)
-    {
-        $category = Category::find()
-            ->where(['category_id' => $id, 'enabled' => 1])
-            //->asArray()
-            ->one();
-
-        if (null === $category) {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-
-        return $category;
-    }
-
-    protected function buildInitialQuery(Category $category, string $t)
-    {
-        $query = Gallery::find()
-            ->select(['g.gallery_id', 'g.image_id', 'g.slug', 'g.title', 'g.orientation', 'g.likes', 'g.dislikes', 'g.images_num', 'g.comments_num', 'g.views', 'g.published_at'])
-            ->alias('g')
-            ->innerJoin(['gcm' => GalleriesCategoriesMap::tableName()], 'g.gallery_id = gcm.gallery_id')
-            ->with(['categories' => function ($query) {
-                $query->select(['category_id', 'title', 'slug', 'h1'])
-                    ->where(['enabled' => 1]);
-            }])
-            ->with(['coverImage' => function ($query) {
-                $query->select(['image_id', 'gallery_id', 'path', 'source_url'])
-                    ->where(['enabled' => 1]);
-            }]);
-
-        if ('all-time' === $t) {
-            $query->untilNow();
-        } elseif ($this->isValidRange($t)) {
-            $query->rangedUntilNow($t);
-        }
-
-        $query
-            ->onlyActive()
-            ->andwhere(['gcm.category_id' => $category->getId()]);
-            //->asArray();
-
-        return $query;
-    }
-
-    protected function buildSort()
-    {
-        return new Sort([
-            'sortParam' => 'o',
-            'attributes' => [
-                'date' => [
-                    'asc' => ['g.published_at' => SORT_DESC],
-                    'desc' => ['g.published_at' => SORT_DESC],
-                    'default' => SORT_DESC,
-                ],
-                'mv' => [
-                    'asc' => ['g.views' => SORT_DESC],
-                    'desc' => ['g.views' => SORT_DESC],
-                    'default' => SORT_DESC,
-                ],
-                'tr' => [
-                    'asc' => ['g.likes' => SORT_DESC],
-                    'desc' => ['g.likes' => SORT_DESC],
-                    'default' => SORT_DESC,
-                ],
-                'ctr' => [ // top rated
-                    'asc' => ['gs.ctr' => SORT_DESC],
-                    'desc' => ['gs.ctr' => SORT_DESC],
-                    'default' => SORT_DESC,
-                ],
-            ],
-            'defaultOrder' => [
-                'date' => [
-                    'g.published_at' => SORT_DESC,
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * Проверяет корректность параметра $t в экшене контроллера.
-     * Значения: daily, weekly, monthly, early, all_time
-     *
-     * @param string $time Ограничение по времени.
-     *
-     * @return string.
-     *
-     * @throws NotFoundHttpException
-     */
-    protected function isValidRange($time)
-    {
-        if (in_array($time, ['daily', 'weekly', 'monthly', 'yearly', 'all-time'])) {
-            return true;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

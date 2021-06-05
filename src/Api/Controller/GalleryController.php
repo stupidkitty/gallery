@@ -2,6 +2,7 @@
 namespace SK\GalleryModule\Api\Controller;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\Cors;
 use yii\rest\Controller;
 use yii\filters\VerbFilter;
@@ -13,16 +14,20 @@ use SK\GalleryModule\Import\ImageCreator;
 use SK\GalleryModule\Api\Form\GalleryForm;
 use SK\GalleryModule\Import\GalleryCreator;
 use SK\GalleryModule\Service\Gallery as GalleryService;
+use yii\web\Request;
+use yii\web\Response;
 
 /**
- * GalleryController
+ * Class GalleryController
+ *
+ * @package SK\GalleryModule\Api\Controller
  */
 class GalleryController extends Controller
 {
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'verbs' => [
@@ -45,7 +50,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Gets galleries
      *
      * @return mixed
      */
@@ -55,27 +60,28 @@ class GalleryController extends Controller
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Gets one gallery by id
      *
-     * @return mixed
+     * @param int $id
+     * @return Gallery
+     * @throws NotFoundHttpException
      */
-    public function actionView($id)
+    public function actionView(int $id): Gallery
     {
-        $gallery = $this->findById($id);
-
-        return $gallery;
+        return $this->findById($id);
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Create a new gallery
      *
-     * @return mixed
+     * @param Request $request
+     * @return array[]|string[]
      */
-    public function actionCreate()
+    public function actionCreate(Request $request)
     {
-        $form = new GalleryForm;
+        $form = new GalleryForm();
 
-        if ($form->load(Yii::$app->getRequest()->post()) && $form->isValid()) {
+        if ($form->load($request->post()) && $form->isValid()) {
             $db = Yii::$app->db;
             $transaction = $db->beginTransaction();
 
@@ -119,7 +125,7 @@ class GalleryController extends Controller
 
 
                 $galleryCreator = new GalleryCreator;
-                $galleryCreator->createFromArray($data, [
+                $gallery = $galleryCreator->createFromArray($data, [
                     'images' => $images,
                     'categories' => $categories,
                 ]);
@@ -127,7 +133,7 @@ class GalleryController extends Controller
                 $transaction->commit();
 
                 return [
-                    'message' => "Gallery \"{$gallery->title}\" created",
+                    'message' => $gallery !== null ? "Gallery \"{$data['title']}\" created" : "Gallery \"{$data['title']}\" exists",
                 ];
             } catch (\Exception $e) {
                 $transaction->rollBack();
@@ -156,15 +162,19 @@ class GalleryController extends Controller
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Update the category by id
      *
-     * @return mixed
+     * @param Request $request
+     * @param int $id
+     * @return array|array[]
+     * @throws NotFoundHttpException
+     * @throws InvalidConfigException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(Request $request, int $id): array
     {
         $gallery = $this->findById($id);
 
-        $gallery->load(['Gallery' => Yii::$app->getRequest()->getBodyParams()]);
+        $gallery->load(['Gallery' => $request->getBodyParams()]);
 
         if ($gallery->save()) {
             return [
@@ -188,20 +198,23 @@ class GalleryController extends Controller
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Delete the gallery by id
      *
-     * @return mixed
+     * @param Response $response
+     * @param int $id
+     * @return array[]|string
+     * @throws NotFoundHttpException
      */
-    public function actionDelete($id)
+    public function actionDelete(Response $response, int $id)
     {
         $gallery = $this->findById($id);
-        $galleryService = new GalleryService;
+        $galleryService = new GalleryService();
 
         if ($galleryService->delete($gallery)) {
             return '';
         }
 
-        Yii::$app->getResponse()->setStatusCode(422);
+        $response->setStatusCode(422);
 
         $errors = [];
         foreach($gallery->getErrorSummary(true) as $message) {
@@ -220,11 +233,12 @@ class GalleryController extends Controller
     /**
      * Finds the Gallery model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     *
      * @param integer $id
      * @return Gallery the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findById(int $id)
+    protected function findById(int $id): Gallery
     {
         $gallery = GalleryService::findById($id);
 

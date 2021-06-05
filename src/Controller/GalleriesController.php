@@ -1,15 +1,16 @@
 <?php
+
 namespace SK\GalleryModule\Controller;
 
-use Yii;
-use yii\web\Controller;
-use yii\filters\PageCache;
-use yii\data\ActiveDataProvider;
-use yii\base\ViewContextInterface;
-use yii\web\NotFoundHttpException;
-use SK\GalleryModule\Model\Gallery;
 use RS\Component\Core\Filter\QueryParamsFilter;
 use RS\Component\Core\Settings\SettingsInterface;
+use SK\GalleryModule\Cache\PageCache;
+use SK\GalleryModule\Model\Gallery;
+use Yii;
+use yii\base\ViewContextInterface;
+use yii\data\ActiveDataProvider;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 /**
  * GalleriesController implements the CRUD actions for Gallery model.
@@ -19,7 +20,7 @@ class GalleriesController extends Controller implements ViewContextInterface
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'queryParams' => [
@@ -67,11 +68,8 @@ class GalleriesController extends Controller implements ViewContextInterface
      * Lists all Galleries models.
      *
      * @param int $page Текущая страница.
-     *
      * @param string $o Сортировка выборки
-     *
      * @param string $t Ограничение выборки по времени.
-     *
      * @return mixed
      */
     public function actionIndex($page = 1, $o = 'date', $t = 'all-time')
@@ -149,7 +147,25 @@ class GalleriesController extends Controller implements ViewContextInterface
     }
 
     /**
+     * Проверяет корректность параметра $t в экшене контроллера.
+     * daily, weekly, monthly, early, all_time
+     *
+     * @param string $time Ограничение по времени.
+     * @return string.
+     * @throws NotFoundHttpException
+     */
+    protected function isValidRange($time): bool
+    {
+        if (in_array($time, ['daily', 'weekly', 'monthly', 'yearly', 'all-time'])) {
+            return true;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
      * Lists all Galleries models. Order by date
+     *
      * @return mixed
      */
     public function actionDate($page = 1, $t = 'all-time')
@@ -203,6 +219,7 @@ class GalleriesController extends Controller implements ViewContextInterface
 
     /**
      * Lists all Galleries models. Order by views
+     *
      * @return mixed
      */
     public function actionViews($page = 1, $t = 'all-time')
@@ -256,6 +273,7 @@ class GalleriesController extends Controller implements ViewContextInterface
 
     /**
      * Lists all Galleries models. Order by likes
+     *
      * @return mixed
      */
     public function actionLikes($page = 1, $t = 'all-time')
@@ -309,6 +327,7 @@ class GalleriesController extends Controller implements ViewContextInterface
 
     /**
      * Lists all Galleries models. Order by ctr
+     *
      * @return mixed
      */
     public function actionCtr($page = 1, $t = 'all-time')
@@ -358,24 +377,5 @@ class GalleriesController extends Controller implements ViewContextInterface
             'pagination' => $pagination,
             'galleries' => $galleries,
         ]);
-    }
-
-    /**
-     * Проверяет корректность параметра $t в экшене контроллера.
-     * daily, weekly, monthly, early, all_time
-     *
-     * @param string $time Ограничение по времени.
-     *
-     * @return string.
-     *
-     * @throws NotFoundHttpException
-     */
-    protected function isValidRange($time): bool
-    {
-        if (in_array($time, ['daily', 'weekly', 'monthly', 'yearly', 'all-time'])) {
-            return true;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }
