@@ -12,14 +12,16 @@ use SK\GalleryModule\Model\Category;
 use RS\Component\Core\Settings\SettingsInterface;
 
 /**
- * InfoController
+ * Class InfoController
+ *
+ * @package SK\GalleryModule\Api\Controller
  */
 class InfoController extends Controller
 {
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'verbs' => [
@@ -38,13 +40,13 @@ class InfoController extends Controller
     }
 
     /**
-     * Gets info about auto postig. Max date post and count future posts.
+     * Show information about galleries
+     *
+     * @param SettingsInterface $settings
      * @return array
      */
-    public function actionIndex()
+    public function actionIndex(SettingsInterface $settings): array
     {
-        $settings = Yii::$container->get(SettingsInterface::class);
-
         $data = [];
 
         $data['total_galleries_num'] = Gallery::find()->count();
