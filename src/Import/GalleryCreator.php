@@ -6,16 +6,9 @@ use SK\GalleryModule\Model\RotationStats;
 
 class GalleryCreator
 {
-    private $options;
-
-    public function __construct(array $options = [])
-    {
-        $this->options = $options;
-    }
-
     public function createFromArray(array $data, array $extra = [])
     {
-        $gallery = new Gallery;
+        $gallery = new Gallery();
 
         if (!empty($data['gallery_id'])) {
             $isExists = Gallery::find()
@@ -23,7 +16,7 @@ class GalleryCreator
                 ->exists();
 
             if ($isExists) { // пропустим вставку записи, т.к. галерея уже существует.
-                return false;
+                return null;
             }
 
             $gallery->gallery_id = (int) $data['gallery_id'];
