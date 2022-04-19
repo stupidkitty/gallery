@@ -2,7 +2,7 @@
 namespace SK\GalleryModule\CronJob;
 
 use SK\VideoModule\Service\Category;
-use SK\CronModule\Handler\HandlerInterface;
+use App\Infrastructure\Cron\HandlerInterface;
 
 class ClearOldStats implements HandlerInterface
 {

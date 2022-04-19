@@ -2,7 +2,7 @@
 namespace SK\GalleryModule\CronJob;
 
 use SK\GalleryModule\Service\Category;
-use SK\CronModule\Handler\HandlerInterface;
+use App\Infrastructure\Cron\HandlerInterface;
 
 class CountGalleries implements HandlerInterface
 {

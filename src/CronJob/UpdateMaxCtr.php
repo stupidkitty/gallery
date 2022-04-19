@@ -2,7 +2,7 @@
 namespace SK\GalleryModule\CronJob;
 
 use SK\GalleryModule\Service\Gallery;
-use SK\CronModule\Handler\HandlerInterface;
+use App\Infrastructure\Cron\HandlerInterface;
 
 class UpdateMaxCtr implements HandlerInterface
 {

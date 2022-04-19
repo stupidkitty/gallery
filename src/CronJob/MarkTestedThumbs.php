@@ -2,7 +2,7 @@
 namespace SK\GalleryModule\CronJob;
 
 use SK\GalleryModule\Service\Rotator;
-use SK\CronModule\Handler\HandlerInterface;
+use App\Infrastructure\Cron\HandlerInterface;
 
 class MarkTestedThumbs implements HandlerInterface
 {
